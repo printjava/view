@@ -1,191 +1,123 @@
-import './style.css'
+import "./style.css";
 
-import * as THREE from 'three';
+import * as THREE from "three";
 
-import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+import { STLLoader } from "three/addons/loaders/STLLoader.js";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
-let container, stats;
+let container;
 
-let camera, cameraTarget, scene, renderer;
+let camera, scene, renderer, controls;
 
 init();
 
 function init() {
+  container = document.createElement("div");
+  document.body.appendChild(container);
 
-  container = document.createElement( 'div' );
-  document.body.appendChild( container );
-
-  camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
-  camera.position.set( 3, 0.15, 3 );
-
-  cameraTarget = new THREE.Vector3( 0, - 0.25, 0 );
+  camera = new THREE.PerspectiveCamera(
+    40,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  );
+  camera.position.set(20, 10, 20);
+  camera.lookAt(0, 0, 0);
 
   scene = new THREE.Scene();
-  scene.background = new THREE.Color( 0x72645b );
-  scene.fog = new THREE.Fog( 0x72645b, 2, 15 );
+  scene.background = new THREE.Color(0x424242);
 
   // Ground
 
   const plane = new THREE.Mesh(
-    new THREE.PlaneGeometry( 40, 40 ),
-    new THREE.MeshPhongMaterial( { color: 0xcbcbcb, specular: 0x474747 } )
+    new THREE.PlaneGeometry(25.6, 25.6),
+    new THREE.MeshPhongMaterial({
+      color: 0x000000,
+      shininess: 0,
+      specular: 0x444444,
+    })
   );
-  plane.rotation.x = - Math.PI / 2;
-  plane.position.y = - 0.5;
-  scene.add( plane );
-
-  plane.receiveShadow = true;
-
-  const sphere = new THREE.Mesh(new THREE.SphereGeometry(1), new THREE.MeshBasicMaterial({color: 0xff0000}));
-  scene.add(sphere);
+  plane.rotation.x = -Math.PI / 2;
+  scene.add(plane);
 
   // ASCII file
 
   const loader = new STLLoader();
-  loader.load( './models/stl/ascii/slotted_disk.stl', function ( geometry ) {
-
-    const material = new THREE.MeshPhongMaterial( { color: 0xff9c7c, specular: 0x494949, shininess: 200 } );
-    const mesh = new THREE.Mesh( geometry, material );
-
-    mesh.position.set( 0, - 0.25, 0.6 );
-    mesh.rotation.set( 0, - Math.PI / 2, 0 );
-    mesh.scale.set( 0.5, 0.5, 0.5 );
+  loader.load("./test.stl", function (geometry) {
+    const material = new THREE.MeshPhongMaterial({
+      color: 0x808080,
+      specular: 0xffffff,
+    });
+    const mesh = new THREE.Mesh(geometry, material);
 
     mesh.castShadow = true;
     mesh.receiveShadow = true;
 
-    scene.add( mesh );
-
-  } );
-
-
-  // Binary files
-
-  const material = new THREE.MeshPhongMaterial( { color: 0xd5d5d5, specular: 0x494949, shininess: 200 } );
-
-  loader.load( './models/stl/binary/pr2_head_pan.stl', function ( geometry ) {
-
-    const mesh = new THREE.Mesh( geometry, material );
-
-    mesh.position.set( 0, - 0.37, - 0.6 );
-    mesh.rotation.set( - Math.PI / 2, 0, 0 );
-    mesh.scale.set( 2, 2, 2 );
-
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-
-    scene.add( mesh );
-
-  } );
-
-  loader.load( './models/stl/binary/pr2_head_tilt.stl', function ( geometry ) {
-
-    const mesh = new THREE.Mesh( geometry, material );
-
-    mesh.position.set( 0.136, - 0.37, - 0.6 );
-    mesh.rotation.set( - Math.PI / 2, 0.3, 0 );
-    mesh.scale.set( 2, 2, 2 );
-
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-
-    scene.add( mesh );
-
-  } );
-
-  // Colored binary STL
-  loader.load( './models/stl/binary/colored.stl', function ( geometry ) {
-
-    let meshMaterial = material;
-
-    if ( geometry.hasColors ) {
-
-      meshMaterial = new THREE.MeshPhongMaterial( { opacity: geometry.alpha, vertexColors: true } );
-
-    }
-
-    const mesh = new THREE.Mesh( geometry, meshMaterial );
-
-    mesh.position.set( 0.5, 0.2, 0 );
-    mesh.rotation.set( - Math.PI / 2, Math.PI / 2, 0 );
-    mesh.scale.set( 0.3, 0.3, 0.3 );
-
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-
-    scene.add( mesh );
-
-  } );
-
+    scene.add(mesh);
+  });
 
   // Lights
 
-  scene.add( new THREE.HemisphereLight( 0x8d7c7c, 0x494966, 3 ) );
+  scene.add(new THREE.HemisphereLight(0x808080, 0xffffff, 5));
 
-  addShadowedLight( 1, 1, 1, 0xffffff, 3.5 );
-  addShadowedLight( 0.5, 1, - 1, 0xffd500, 3 );
   // renderer
 
-  renderer = new THREE.WebGLRenderer( { antialias: true } );
-  renderer.setPixelRatio( window.devicePixelRatio );
-  renderer.setSize( window.innerWidth, window.innerHeight );
-  renderer.setAnimationLoop( animate );
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 5);
+  directionalLight.position.set(40, 20, 40);
+  scene.add(directionalLight);
 
-  renderer.shadowMap.enabled = true;
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setAnimationLoop(animate);
 
-  container.appendChild( renderer.domElement );
+  container.appendChild(renderer.domElement);
 
-  window.addEventListener( 'resize', onWindowResize );
+  window.addEventListener("resize", onWindowResize);
 
-}
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.listenToKeyEvents(window); // optional
 
-function addShadowedLight( x, y, z, color, intensity ) {
+  //controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
 
-  const directionalLight = new THREE.DirectionalLight( color, intensity );
-  directionalLight.position.set( x, y, z );
-  scene.add( directionalLight );
+  controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+  controls.dampingFactor = 0.25;
 
-  directionalLight.castShadow = true;
+  controls.screenSpacePanning = false;
 
-  const d = 1;
-  directionalLight.shadow.camera.left = - d;
-  directionalLight.shadow.camera.right = d;
-  directionalLight.shadow.camera.top = d;
-  directionalLight.shadow.camera.bottom = - d;
+  controls.minDistance = 1;
+  controls.maxDistance = 40;
 
-  directionalLight.shadow.camera.near = 1;
-  directionalLight.shadow.camera.far = 4;
+  controls.maxPolarAngle = Math.PI / 2;
 
-  directionalLight.shadow.bias = - 0.002;
+  const minorGridHelper = new THREE.GridHelper(25.6, 256, 0xff0000, 0x404040);
+  minorGridHelper.position.y = 0.01;
+  scene.add(minorGridHelper);
 
+  const gridHelper = new THREE.GridHelper(25, 25, 0xff0000, 0x808080);
+  gridHelper.position.y = 0.02;
+  scene.add(gridHelper);
 }
 
 function onWindowResize() {
-
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
 
-  renderer.setSize( window.innerWidth, window.innerHeight );
-
+  renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 function animate() {
-
   render();
-  stats.update();
-
 }
 
 function render() {
+  //const timer = Date.now() * 0.0005;
 
-  const timer = Date.now() * 0.0005;
+  //camera.position.x = Math.cos( timer ) * 3;
+  //camera.position.z = Math.sin( timer ) * 3;
 
-  camera.position.x = Math.cos( timer ) * 3;
-  camera.position.z = Math.sin( timer ) * 3;
+  //camera.lookAt( cameraTarget );
+  controls.update();
 
-  camera.lookAt( cameraTarget );
-
-  renderer.render( scene, camera );
-
+  renderer.render(scene, camera);
 }
-
