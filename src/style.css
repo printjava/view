@@ -1,49 +1,49 @@
 body {
-  margin: 0;
-  place-items: center;
+    margin: 0;
+    place-items: center;
 }
 
 * {
-  font-family: system-ui;
-  transition: all .2s ease;
+    font-family: system-ui;
+    transition: all 0.2s ease;
 }
 
 canvas {
-  position: absolute;
-  z-index: -1;
-  left: 0;
-  top: 0;
+    position: absolute;
+    z-index: -1;
+    left: 0;
+    top: 0;
 }
 
 .documentation {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  padding: 4px 8px;
-  backdrop-filter: blur(8px);
-  background: rgba(0, 0, 0, 0.1);
-  color: rgba(255, 255, 255, 0.7);
-  border-radius: 8px;
-  width: fit-content;
-  cursor: pointer;
-  margin: 8px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 4px 8px;
+    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    width: fit-content;
+    cursor: pointer;
+    margin: 8px;
 }
 
 .documentation:hover {
-  background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.2);
 }
 
 .hints {
-  position: absolute;
-  font-size: 12px;
-  top: 100dvh;
-  left: 0;
-  width: fit-content;
-  padding: 8px;
-  transform: translateY(-100%);
-  color: rgba(255,255,255,0.5);
-  background: rgba(0, 0, 0, 0.1);
-  border-top-right-radius: 8px;
-  backdrop-filter: blur(8px);
+    position: absolute;
+    font-size: 12px;
+    top: 100dvh;
+    left: 0;
+    width: fit-content;
+    padding: 8px;
+    transform: translateY(-100%);
+    color: rgba(255, 255, 255, 0.5);
+    background: rgba(0, 0, 0, 0.1);
+    border-top-right-radius: 8px;
+    backdrop-filter: blur(8px);
 }
