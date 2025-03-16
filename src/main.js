@@ -27,8 +27,6 @@ function init() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x424242);
 
-  // Ground
-
   const plane = new THREE.Mesh(
     new THREE.PlaneGeometry(25.6, 25.6),
     new THREE.MeshPhongMaterial({
@@ -39,8 +37,6 @@ function init() {
   );
   plane.rotation.x = -Math.PI / 2;
   scene.add(plane);
-
-  // ASCII file
 
   const loader = new STLLoader();
   loader.load("./test.stl", function (geometry) {
@@ -56,11 +52,7 @@ function init() {
     scene.add(mesh);
   });
 
-  // Lights
-
   scene.add(new THREE.HemisphereLight(0x808080, 0xffffff, 5));
-
-  // renderer
 
   const directionalLight = new THREE.DirectionalLight(0xffffff, 5);
   directionalLight.position.set(40, 20, 40);
@@ -76,17 +68,14 @@ function init() {
   window.addEventListener("resize", onWindowResize);
 
   controls = new OrbitControls(camera, renderer.domElement);
-  controls.listenToKeyEvents(window); // optional
 
-  //controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
-
-  controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+  controls.enableDamping = true;
   controls.dampingFactor = 0.25;
 
   controls.screenSpacePanning = false;
 
   controls.minDistance = 1;
-  controls.maxDistance = 40;
+  controls.maxDistance = 70;
 
   controls.maxPolarAngle = Math.PI / 2;
 
