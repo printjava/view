@@ -9,6 +9,29 @@ let container;
 
 let camera, scene, renderer, controls;
 
+let floor_display = true;
+let floor;
+let grid_display = true;
+let gridHelpers = [];
+
+document.querySelector(".disable-floor").addEventListener("click", () => {
+    floor_display = !floor_display;
+    document.querySelector(".disable-floor").classList.toggle("active");
+    floor.visible = floor_display;
+    controls.maxPolarAngle = floor_display ? Math.PI / 2 - 0.05 : Math.PI
+})
+
+document.querySelector(".disable-grid").addEventListener("click", () => {
+    grid_display = !grid_display;
+    document.querySelector(".disable-grid").classList.toggle("active");
+
+    gridHelpers.forEach((grid) => {
+        grid.visible = grid_display;
+    });
+
+    controls.maxPolarAngle = grid_display ? Math.PI / 2 - 0.05 : Math.PI;
+});
+
 init();
 
 function init() {
@@ -37,6 +60,7 @@ function init() {
     );
     plane.rotation.x = -Math.PI / 2;
     scene.add(plane);
+    floor = plane;
 
     const loader = new STLLoader();
     loader.load("./test.stl", function (geometry) {
@@ -77,15 +101,19 @@ function init() {
     controls.minDistance = 1;
     controls.maxDistance = 70;
 
-    controls.maxPolarAngle = Math.PI / 2;
+    controls.maxPolarAngle = Math.PI / 2 - 0.05;
 
-    const minorGridHelper = new THREE.GridHelper(25.6, 256, 0xff0000, 0x404040);
-    minorGridHelper.position.y = 0.01;
-    scene.add(minorGridHelper);
+    if (grid_display) {
+        const minorGridHelper = new THREE.GridHelper(25.6, 256, 0xff0000, 0x404040);
+        minorGridHelper.position.y = 0.01;
+        scene.add(minorGridHelper);
+        gridHelpers.push(minorGridHelper);
 
-    const gridHelper = new THREE.GridHelper(25, 25, 0xff0000, 0x808080);
-    gridHelper.position.y = 0.02;
-    scene.add(gridHelper);
+        const gridHelper = new THREE.GridHelper(25, 25, 0xff0000, 0x808080);
+        gridHelper.position.y = 0.02;
+        scene.add(gridHelper);
+        gridHelpers.push(gridHelper);
+    }
 }
 
 function onWindowResize() {
