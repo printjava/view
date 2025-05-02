@@ -32,6 +32,41 @@ document.querySelector(".disable-grid").addEventListener("click", () => {
     controls.maxPolarAngle = grid_display ? Math.PI / 2 - 0.05 : Math.PI;
 });
 
+document.addEventListener('dragenter', preventDefaults, false);
+document.addEventListener('dragover', preventDefaults, false);
+
+function preventDefaults (e) {
+  e.preventDefault();
+  e.stopPropagation();
+}
+
+document.addEventListener("drop", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const file = e.dataTransfer.files[0];
+
+    console.log(file);
+
+    const reader = new FileReader();
+    reader.onload = function (event) {
+        const loader = new STLLoader();
+        const arrayBuffer = event.target.result;
+        const geometry = loader.parse(arrayBuffer);
+
+        const material = new THREE.MeshPhongMaterial({
+            color: 0x808080,
+            specular: 0xffffff,
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        scene.add(mesh);
+    };
+    reader.readAsArrayBuffer(file);
+});
+
 init();
 
 function init() {
@@ -61,20 +96,6 @@ function init() {
     plane.rotation.x = -Math.PI / 2;
     scene.add(plane);
     floor = plane;
-
-    const loader = new STLLoader();
-    loader.load("./test.stl", function (geometry) {
-        const material = new THREE.MeshPhongMaterial({
-            color: 0x808080,
-            specular: 0xffffff,
-        });
-        const mesh = new THREE.Mesh(geometry, material);
-
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-
-        scene.add(mesh);
-    });
 
     scene.add(new THREE.HemisphereLight(0x808080, 0xffffff, 5));
 
