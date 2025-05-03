@@ -29,8 +29,91 @@ document.querySelector(".disable-grid").addEventListener("click", () => {
         grid.visible = grid_display;
     });
 
-    controls.maxPolarAngle = grid_display ? Math.PI / 2 - 0.05 : Math.PI;
 });
+
+document.querySelector(".show-wireframe").addEventListener("click", () => {
+    const model = scene.getObjectByName("model");
+    if (model) {
+        model.material.wireframe = !model.material.wireframe;
+        document.querySelector(".show-wireframe").classList.toggle("active");
+    }
+})
+
+document.querySelector(".reset-cam").addEventListener("click", () => {
+    camera.position.set(20, 10, 20);
+    controls.target.set(0, 0, 0);
+    camera.lookAt(0, 0, 0);
+    controls.update();
+})
+
+document.querySelector(".debug-normals").addEventListener("click", () => {
+    const model = scene.getObjectByName("model");
+    if(!document.querySelector(".debug-normals").classList.contains("active")) {
+        model.material = new THREE.MeshPhongMaterial({
+            color: 0x0000ff,
+            specular: 0x808080,
+            side: THREE.FrontSide
+        });
+        const backside_model = new THREE.Mesh(model.geometry.clone(), new THREE.MeshPhongMaterial({
+            color: 0xff0000,
+            specular: 0x808080,
+            side: THREE.BackSide
+        }));
+        backside_model.name = "backside_model";
+        backside_model.position.copy(model.position);
+        backside_model.rotation.copy(model.rotation);
+        backside_model.scale.copy(model.scale);
+        scene.add(backside_model);
+    } else {
+        const backside_model = scene.getObjectByName("backside_model");
+        if(backside_model) {
+            scene.remove(backside_model);
+        }
+        model.material = new THREE.MeshPhongMaterial({
+            color: 0x808080,
+            specular: 0xffffff,
+        });
+    }
+
+    document.querySelector(".debug-normals").classList.toggle("active");
+});
+
+document.querySelector(".choose-file").addEventListener("click", () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".stl";
+    input.addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const loader = new STLLoader();
+                const arrayBuffer = event.target.result;
+                const geometry = loader.parse(arrayBuffer);
+
+                const material = new THREE.MeshPhongMaterial({
+                    color: 0x808080,
+                    specular: 0xffffff,
+                });
+                const mesh = new THREE.Mesh(geometry, material);
+
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                mesh.name = "model";
+
+                scene.children.forEach((child) => {
+                    if (child.name === "model") {
+                        scene.remove(child);
+                    }
+                })
+
+                scene.add(mesh);
+            };
+            reader.readAsArrayBuffer(file);
+        }
+    });
+    input.click();
+})
 
 document.addEventListener('dragenter', preventDefaults, false);
 document.addEventListener('dragover', preventDefaults, false);
@@ -45,7 +128,13 @@ document.addEventListener("drop", (e) => {
     e.stopPropagation();
     const file = e.dataTransfer.files[0];
 
-    console.log(file);
+    console.log(scene);
+
+    scene.children.forEach((child) => {
+        if (child.name === "model") {
+            scene.remove(child);
+        }
+    })
 
     const reader = new FileReader();
     reader.onload = function (event) {
@@ -61,6 +150,7 @@ document.addEventListener("drop", (e) => {
 
         mesh.castShadow = true;
         mesh.receiveShadow = true;
+        mesh.name = "model";
 
         scene.add(mesh);
     };

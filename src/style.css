@@ -63,7 +63,7 @@ canvas {
 }
 
 .tools > * {
-    padding: 8px;
+    padding: 4px 8px;
     border-radius: 16px;
     font-size: 12px;
     background: rgba(0, 0, 0, 0.1);
@@ -78,6 +78,24 @@ canvas {
 }
 
 .tools > :hover {
-    background: rgba(0, 0, 0, 0.2);
     color: rgba(255, 255, 255, 1);
+}
+
+.choose-file {
+    position: absolute;
+    left: 50%;
+    top: 95%;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 50px;
+    background: rgba(0, 0, 0, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    cursor: pointer;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+}
+
+.choose-file:hover {
+    color: rgba(255,255,255, 1);
 }
