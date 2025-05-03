@@ -33,8 +33,13 @@ document.querySelector(".disable-grid").addEventListener("click", () => {
 document.querySelector(".show-wireframe").addEventListener("click", () => {
     const model = scene.getObjectByName("model");
     if (model) {
-        model.material.wireframe = !model.material.wireframe;
-        document.querySelector(".show-wireframe").classList.toggle("active");
+        if(document.querySelector(".show-wireframe").classList.contains("active")) {
+            model.material.wireframe = false;
+            document.querySelector(".show-wireframe").classList.remove("active");
+        } else {
+            model.material.wireframe = true;
+            document.querySelector(".show-wireframe").classList.add("active");
+        }
     }
 })
 
@@ -111,6 +116,7 @@ document.querySelector(".choose-file").addEventListener("click", () => {
             reader.readAsArrayBuffer(file);
         }
     });
+    document.querySelector(".choose-file").innerHTML = file.name;
     input.click();
 })
 
@@ -153,6 +159,7 @@ document.addEventListener("drop", (e) => {
 
         scene.add(mesh);
     };
+    document.querySelector(".choose-file").innerHTML = file.name;
     reader.readAsArrayBuffer(file);
 });
 
