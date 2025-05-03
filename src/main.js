@@ -2,8 +2,8 @@ import "./style.css";
 
 import * as THREE from '../node_modules/three/build/three.module.js';
 
-import { STLLoader } from "three/addons/loaders/STLLoader.js";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { STLLoader } from "../node_modules/three/addons/loaders/STLLoader.js";
+import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js";
 
 let container;
 
