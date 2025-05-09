@@ -114,9 +114,9 @@ document.querySelector(".choose-file").addEventListener("click", () => {
                 scene.add(mesh);
             };
             reader.readAsArrayBuffer(file);
+            document.querySelector(".choose-file").innerHTML = file.name;
         }
     });
-    document.querySelector(".choose-file").innerHTML = file.name;
     input.click();
 })
 
@@ -161,6 +161,59 @@ document.addEventListener("drop", (e) => {
     };
     document.querySelector(".choose-file").innerHTML = file.name;
     reader.readAsArrayBuffer(file);
+});
+
+// Add a paste event listener to handle files copied to the clipboard
+document.addEventListener("paste", (e) => {
+    const items = e.clipboardData.items;
+    console.log(items);
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.kind === "file") {
+            const file = item.getAsFile();
+
+            // Validate file extension
+            if (!file.name.toLowerCase().endsWith(".stl")) {
+                console.error("Invalid file format. Only STL files are supported.");
+                alert("Invalid file format. Only STL files are supported.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                try {
+                    const loader = new STLLoader();
+                    const arrayBuffer = event.target.result;
+                    const geometry = loader.parse(arrayBuffer);
+
+                    const material = new THREE.MeshPhongMaterial({
+                        color: 0x808080,
+                        specular: 0xffffff,
+                    });
+                    const mesh = new THREE.Mesh(geometry, material);
+
+                    mesh.castShadow = true;
+                    mesh.receiveShadow = true;
+                    mesh.name = "model";
+
+                    scene.children.forEach((child) => {
+                        if (child.name === "model") {
+                            scene.remove(child);
+                        }
+                    });
+
+                    scene.add(mesh);
+
+                    // Save the file name to localStorage
+                    localStorage.setItem("lastModelFileName", file.name);
+                } catch (error) {
+                    console.error("Error parsing STL file:", error);
+                    alert("Failed to load the STL file. Please check the file and try again.");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+    }
 });
 
 init();
