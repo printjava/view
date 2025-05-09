@@ -29,6 +29,7 @@ canvas {
     width: fit-content;
     cursor: pointer;
     margin: 8px;
+    text-decoration: none;
 }
 
 .documentation:hover {
